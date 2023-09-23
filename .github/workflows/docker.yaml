@@ -12,49 +12,51 @@ on:
 
 env:
     REGISTRY: ghcr.io
-    IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  build-and-publish:
+  build-and-push-image:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      max-parallel: 1
+      matrix:
+        include:
+          - dockerfile: ./docker/Dockerfile.ubuntu_dev_base
+            image: ghcr.io/${{ github.repository_owner }}/xreg-dev-base-ubuntu-20.04
+          - dockerfile: ./docker/Dockerfile.xreg-deps
+            image: ghcr.io/${{ github.repository_owner }}/xreg-deps-ubuntu-20.04
+          # - dockerfile: ./docker/Dockerfile.xreg
+            # image: ghcr.io/${{ github.repository_owner }}/xreg-ubuntu-20.04
+          # - dockerfile: ./docker/Dockerfile.xreg-dist-bin
+            # image: ghcr.io/${{ github.repository_owner }}/xreg-dist-ubuntu-20.04
+    permissions:
+      contents: read
+      packages: write
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Setup Docker buildx
-        uses: docker/setup-buildx-action@79abd3f86f79a9d68a23c75a09a9a85889262adf
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
       - name: Log in to the Container registry
-        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.GH_PACKAGE_TOKEN }}
 
-    #   - name: Extract Docker metadata
-    #     id: meta
-    #     uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
-    #     with:
-    #       images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          
-      - name: Build xreg-dev-base-ubuntu-20.04
-        run: docker buildx build -t ghcr.io/${{ github.repository_owner }}/xreg-dev-base-ubuntu-20.04 --build-arg os_name=ubuntu --build-arg os_version=20.04 -f ./docker/Dockerfile.ubuntu_dev_base .
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          images: ${{ matrix.image }}
 
-      - name: Build xreg-deps-ubuntu-20.04
-        run: docker buildx build -t ghcr.io/${{ github.repository_owner }}/xreg-deps-ubuntu-20.04 --build-arg os_name=ubuntu --build-arg os_version=20.04 -f ./docker/Dockerfile.xreg-deps .
-
-    #   - name: Build xreg-ubuntu-20.04
-    #     run: docker buildx build -t ghcr.io/${{ github.repository_owner }}/xreg-ubuntu-20.04 --build-arg os_name=ubuntu --build-arg os_version=20.04 -f ./docker/Dockerfile.xreg .
-
-    #   - name: Build xreg-dist-ubuntu-20.04
-    #     run: docker buildx build -t ghcr.io/${{ github.repository_owner }}/xreg-dist-ubuntu-20.04 --build-arg os_name=ubuntu --build-arg os_version=20.04 -f ./docker/Dockerfile.xreg-dist-bin .
-
-
-      - name: Push Docker Images to GitHub Container Registry
-        run: |
-          docker push ghcr.io/${{ github.repository_owner }}/xreg-dev-base-ubuntu-20.04
-          docker push ghcr.io/${{ github.repository_owner }}/xreg-deps-ubuntu-20.04
-        #   docker push ghcr.io/${{ github.repository_owner }}/xreg-ubuntu-20.04
-        #   docker push ghcr.io/${{ github.repository_owner }}/xreg-dist-ubuntu-20.04
+      - name: Build and push Docker image Drill4Net.Agent.Service
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+    
 
