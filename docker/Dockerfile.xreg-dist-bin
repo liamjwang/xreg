@@ -8,7 +8,9 @@ ARG os_name=ubuntu
 # for centos choose 7 or 8
 ARG os_version=16.04
 
-FROM xreg-${os_name}-${os_version}
+ARG container_registry=""
+
+FROM ${container_registry}xreg-${os_name}-${os_version}
 
 # need to repeat these due to scope
 ARG os_name

@@ -9,8 +9,10 @@ ARG os_name=ubuntu
 # for centos choose 7 or 8
 ARG os_version=16.04
 
+ARG container_registry=""
+
 # e.g. by running Dockerfile.ubuntu_dev_base or Dockerfile.centos_dev_base
-FROM xreg-dev-base-${os_name}-${os_version} as xreg-dev-base-cust-deps
+FROM ${container_registry}xreg-dev-base-${os_name}-${os_version} as xreg-dev-base-cust-deps
 
 WORKDIR /
 

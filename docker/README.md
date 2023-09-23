@@ -31,14 +31,14 @@ A copy/pastable list of shell commands is provided in [`example_commands`](examp
 
 Specific commands are also listed below:
 
-NOTE: all of these commands assume that the xReg repository contents are located in `~/xreg-git`.
+NOTE: all of these commands assume that the xReg repository contents are located in `~/repos/xreg`.
 
 ### Ubuntu 16.04 Build
 
-1. `docker build -t xreg-dev-base-ubuntu-16.04 --build-arg os_name=ubuntu --build-arg os_version=16.04 -f ~/xreg-git/docker/Dockerfile.ubuntu_dev_base .`
-2. `docker build -t xreg-deps-ubuntu-16.04 --build-arg os_name=ubuntu --build-arg os_version=16.04 -f ~/xreg-git/docker/Dockerfile.xreg-deps .`
-3. `docker build -t xreg-ubuntu-16.04 --build-arg os_name=ubuntu --build-arg os_version=16.04 -f ~/xreg-git/docker/Dockerfile.xreg ~/xreg-git`
-4. `docker build -t xreg-dist-ubuntu-16.04 --build-arg os_name=ubuntu --build-arg os_version=16.04 -f ~/xreg-git/docker/Dockerfile.xreg-dist-bin ~/xreg-git`
+1. `docker build -t xreg-dev-base-ubuntu-16.04 --build-arg os_name=ubuntu --build-arg os_version=16.04 -f ~/repos/xreg/docker/Dockerfile.ubuntu_dev_base .`
+2. `docker build -t xreg-deps-ubuntu-16.04 --build-arg os_name=ubuntu --build-arg os_version=16.04 -f ~/repos/xreg/docker/Dockerfile.xreg-deps .`
+3. `docker build -t xreg-ubuntu-16.04 --build-arg os_name=ubuntu --build-arg os_version=16.04 -f ~/repos/xreg/docker/Dockerfile.xreg ~/repos/xreg`
+4. `docker build -t xreg-dist-ubuntu-16.04 --build-arg os_name=ubuntu --build-arg os_version=16.04 -f ~/repos/xreg/docker/Dockerfile.xreg-dist-bin ~/repos/xreg`
     * Copy the package from the image:
       1. `docker create xreg-dist-ubuntu-16.04` 
       2. `docker cp <container ID>:/xreg-ubuntu-16.04.tar.gz .`
@@ -47,10 +47,10 @@ NOTE: all of these commands assume that the xReg repository contents are located
 
 Basically the steps above with "ubuntu" replaced with "centos" and "16.04" replaced with "7".
 
-1. `docker build -t xreg-dev-base-centos-7 --build-arg os_name=centos --build-arg os_version=7 -f ~/xreg-git/docker/Dockerfile.centos_dev_base .`
-2. `docker build -t xreg-deps-centos-7 --build-arg os_name=centos --build-arg os_version=7 -f ~/xreg-git/docker/Dockerfile.xreg-deps .`
-3. `docker build -t xreg-centos-7 --build-arg os_name=centos --build-arg os_version=7 -f ~/xreg-git/docker/Dockerfile.xreg ~/xreg-git`
-4. `docker build -t xreg-dist-centos-7 --build-arg os_name=centos --build-arg os_version=7 -f ~/xreg-git/docker/Dockerfile.xreg-dist-bin ~/xreg-git`
+1. `docker build -t xreg-dev-base-centos-7 --build-arg os_name=centos --build-arg os_version=7 -f ~/repos/xreg/docker/Dockerfile.centos_dev_base .`
+2. `docker build -t xreg-deps-centos-7 --build-arg os_name=centos --build-arg os_version=7 -f ~/repos/xreg/docker/Dockerfile.xreg-deps .`
+3. `docker build -t xreg-centos-7 --build-arg os_name=centos --build-arg os_version=7 -f ~/repos/xreg/docker/Dockerfile.xreg ~/repos/xreg`
+4. `docker build -t xreg-dist-centos-7 --build-arg os_name=centos --build-arg os_version=7 -f ~/repos/xreg/docker/Dockerfile.xreg-dist-bin ~/repos/xreg`
     * Copy the package from the image:
       1. `docker create xreg-dist-centos-7` 
       2. `docker cp <container ID>:/xreg-centos-7.tar.gz .`

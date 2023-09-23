@@ -21,8 +21,8 @@ jobs:
       max-parallel: 1
       matrix:
         include:
-          - dockerfile: ./docker/Dockerfile.ubuntu_dev_base
-            image: ghcr.io/${{ github.repository_owner }}/xreg-dev-base-ubuntu-20.04
+          # - dockerfile: ./docker/Dockerfile.ubuntu_dev_base
+            # image: ghcr.io/${{ github.repository_owner }}/xreg-dev-base-ubuntu-20.04
           - dockerfile: ./docker/Dockerfile.xreg-deps
             image: ghcr.io/${{ github.repository_owner }}/xreg-deps-ubuntu-20.04
           # - dockerfile: ./docker/Dockerfile.xreg
@@ -61,5 +61,6 @@ jobs:
           build-args: |
             os_version=20.04
             os_name=ubuntu
+            container_registry=${{ env.REGISTRY }}/${{ github.repository_owner }}/
 
 
