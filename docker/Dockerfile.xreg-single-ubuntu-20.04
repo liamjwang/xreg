@@ -169,6 +169,11 @@ RUN mkdir vtk_build && cd vtk_build && \
 
 # FROM xreg-deps-${os_name}-${os_version}
 
+RUN export DEBIAN_FRONTEND=noninteractive && \
+    apt-get update && apt-get install -y --no-install-recommends \
+    libtbb2 && \
+    rm -rf /var/lib/apt/lists/*
+
 WORKDIR /xreg_build
 
 COPY . .
@@ -181,9 +186,3 @@ RUN mkdir build && cd build && \
           .. && \
     cmake --build . && cmake --build . --target install && \
     cd / && rm -rf xreg_build
-
-
-RUN export DEBIAN_FRONTEND=noninteractive && \
-    apt-get update && apt-get install -y --no-install-recommends \
-    libtbb2 && \
-    rm -rf /var/lib/apt/lists/*

@@ -10,6 +10,11 @@ ARG os_version=16.04
 
 FROM xreg-deps-${os_name}-${os_version}
 
+RUN export DEBIAN_FRONTEND=noninteractive && \
+    apt-get update && apt-get install -y --no-install-recommends \
+    libtbb2 && \
+    rm -rf /var/lib/apt/lists/*
+
 WORKDIR /xreg_build
 
 COPY . .
@@ -22,4 +27,3 @@ RUN mkdir build && cd build && \
           .. && \
     cmake --build . && cmake --build . --target install && \
     cd / && rm -rf xreg_build
-
