@@ -39,22 +39,22 @@ jobs:
     #       images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           
       - name: Build xreg-dev-base-ubuntu-20.04
-        run: docker buildx build -t xreg-dev-base-ubuntu-20.04 --build-arg os_name=ubuntu --build-arg os_version=20.04 -f ./docker/Dockerfile.ubuntu_dev_base .
+        run: docker buildx build -t ghcr.io/${{ github.repository_owner }}/xreg-dev-base-ubuntu-20.04 --build-arg os_name=ubuntu --build-arg os_version=20.04 -f ./docker/Dockerfile.ubuntu_dev_base .
 
-    #   - name: Build xreg-deps-ubuntu-20.04
-    #     run: docker buildx build -t xreg-deps-ubuntu-20.04 --build-arg os_name=ubuntu --build-arg os_version=20.04 -f ./docker/Dockerfile.xreg-deps .
+      - name: Build xreg-deps-ubuntu-20.04
+        run: docker buildx build -t ghcr.io/${{ github.repository_owner }}/xreg-deps-ubuntu-20.04 --build-arg os_name=ubuntu --build-arg os_version=20.04 -f ./docker/Dockerfile.xreg-deps .
 
     #   - name: Build xreg-ubuntu-20.04
-    #     run: docker buildx build -t xreg-ubuntu-20.04 --build-arg os_name=ubuntu --build-arg os_version=20.04 -f ./docker/Dockerfile.xreg .
+    #     run: docker buildx build -t ghcr.io/${{ github.repository_owner }}/xreg-ubuntu-20.04 --build-arg os_name=ubuntu --build-arg os_version=20.04 -f ./docker/Dockerfile.xreg .
 
     #   - name: Build xreg-dist-ubuntu-20.04
-    #     run: docker buildx build -t xreg-dist-ubuntu-20.04 --build-arg os_name=ubuntu --build-arg os_version=20.04 -f ./docker/Dockerfile.xreg-dist-bin .
+    #     run: docker buildx build -t ghcr.io/${{ github.repository_owner }}/xreg-dist-ubuntu-20.04 --build-arg os_name=ubuntu --build-arg os_version=20.04 -f ./docker/Dockerfile.xreg-dist-bin .
 
 
       - name: Push Docker Images to GitHub Container Registry
         run: |
           docker push ghcr.io/${{ github.repository_owner }}/xreg-dev-base-ubuntu-20.04
-        #   docker push ghcr.io/${{ github.repository_owner }}/xreg-deps-ubuntu-20.04
+          docker push ghcr.io/${{ github.repository_owner }}/xreg-deps-ubuntu-20.04
         #   docker push ghcr.io/${{ github.repository_owner }}/xreg-ubuntu-20.04
         #   docker push ghcr.io/${{ github.repository_owner }}/xreg-dist-ubuntu-20.04
 
