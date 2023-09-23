@@ -7,11 +7,13 @@ on:
     branches: [ "master" ]
     # Publish semver tags as releases.
     # tags: [ 'v*.*.*' ]
-  pull_request:
-    branches: [ "master" ]
+  # pull_request:
+  #   branches: [ "master" ]
 
 env:
     REGISTRY: ghcr.io
+    OS_NAME: ubuntu
+    OS_VERSION: 20.04
 
 jobs:
   build-and-push-image:
@@ -22,9 +24,9 @@ jobs:
       matrix:
         include:
           - dockerfile: ./docker/Dockerfile.ubuntu_dev_base
-            image: ghcr.io/${{ github.repository_owner }}/xreg-dev-base-ubuntu-20.04
+            image: ghcr.io/${{ github.repository_owner }}/xreg-dev-base-${{ env.OS_NAME }}-${{ env.OS_VERSION }}
           - dockerfile: ./docker/Dockerfile.xreg-deps
-            image: ghcr.io/${{ github.repository_owner }}/xreg-deps-ubuntu-20.04
+            image: ghcr.io/${{ github.repository_owner }}/xreg-deps-${{ env.OS_NAME }}-${{ env.OS_VERSION }}
           # - dockerfile: ./docker/Dockerfile.xreg
             # image: ghcr.io/${{ github.repository_owner }}/xreg-ubuntu-20.04
           # - dockerfile: ./docker/Dockerfile.xreg-dist-bin
@@ -50,7 +52,7 @@ jobs:
         with:
           images: ${{ matrix.image }}
 
-      - name: Build and push Docker image Drill4Net.Agent.Service
+      - name: Build and push Docker image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
           context: .
@@ -58,5 +60,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-    
+          build-args: |
+            os_version=${{ env.OS_VERSION }}
+            os_name=${{ env.OS_NAME }}
+
 
