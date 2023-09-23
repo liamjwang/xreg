@@ -1,4 +1,9 @@
-name: Build and Publish Docker Containers
+name: Docker
+
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
 
 on:
   schedule:
@@ -6,61 +11,64 @@ on:
   push:
     branches: [ "master" ]
     # Publish semver tags as releases.
-    # tags: [ 'v*.*.*' ]
+  #   tags: [ 'v*.*.*' ]
   # pull_request:
   #   branches: [ "master" ]
 
 env:
-    REGISTRY: ghcr.io
+  # Use docker.io for Docker Hub if empty
+  REGISTRY: ghcr.io
+  # github.repository as <account>/<repo>
+  IMAGE_NAME: ${{ github.repository }}
+
 
 jobs:
-  build-and-push-image:
+  build:
+
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: true
-      max-parallel: 1
-      matrix:
-        include:
-          # - dockerfile: ./docker/Dockerfile.ubuntu_dev_base
-            # image: ghcr.io/${{ github.repository_owner }}/xreg-dev-base-ubuntu-20.04
-          - dockerfile: ./docker/Dockerfile.xreg-deps
-            image: ghcr.io/${{ github.repository_owner }}/xreg-deps-ubuntu-20.04
-          # - dockerfile: ./docker/Dockerfile.xreg
-            # image: ghcr.io/${{ github.repository_owner }}/xreg-ubuntu-20.04
-          # - dockerfile: ./docker/Dockerfile.xreg-dist-bin
-            # image: ghcr.io/${{ github.repository_owner }}/xreg-dist-ubuntu-20.04
     permissions:
       contents: read
       packages: write
+      # This is used to complete the identity challenge
+      # with sigstore/fulcio when running outside of PRs.
+      id-token: write
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Log in to the Container registry
-        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+      # Workaround: https://github.com/docker/build-push-action/issues/461
+      - name: Setup Docker buildx
+        uses: docker/setup-buildx-action@79abd3f86f79a9d68a23c75a09a9a85889262adf
+
+      # Login against a Docker registry except on PR
+      # https://github.com/docker/login-action
+      - name: Log into registry ${{ env.REGISTRY }}
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata (tags, labels) for Docker
+      # Extract metadata (tags, labels) for Docker
+      # https://github.com/docker/metadata-action
+      - name: Extract Docker metadata
         id: meta
         uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
         with:
-          images: ${{ matrix.image }}
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
+      # Build and push Docker image with Buildx (don't push on PR)
+      # https://github.com/docker/build-push-action
       - name: Build and push Docker image
-        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        id: build-and-push
+        uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a
         with:
           context: .
-          file: ${{ matrix.dockerfile }}
-          push: true
+          file: ./docker/Dockerfile.xreg-single-ubuntu-20.04
+          push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            os_version=20.04
-            os_name=ubuntu
-            container_registry=${{ env.REGISTRY }}/${{ github.repository_owner }}/
-
-
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

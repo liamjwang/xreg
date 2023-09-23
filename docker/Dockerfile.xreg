@@ -8,9 +8,7 @@ ARG os_name=ubuntu
 # for centos choose 7 or 8
 ARG os_version=16.04
 
-ARG container_registry=""
-
-FROM ${container_registry}xreg-deps-${os_name}-${os_version}
+FROM xreg-deps-${os_name}-${os_version}
 
 WORKDIR /xreg_build
 
